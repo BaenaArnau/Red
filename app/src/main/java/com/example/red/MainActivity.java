@@ -37,55 +37,58 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarMain.toolbar);
-        //binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
-        //    @Override
-        //    public void onClick(View view) {
-        //        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-        //                .setAction("Action", null).show();
-        //    }
-        //});
-
+        /*binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });*/
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(R.id.homeFragment)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
         View header = navigationView.getHeaderView(0);
-        final ImageView photo = header.findViewById(R.id.imageView);
+        final ImageView photo = header.findViewById(R.id.photoImageView);
         final TextView name = header.findViewById(R.id.displayNameTextView);
-        final TextView email = header.findViewById(R.id.textView);
+        final TextView email = header.findViewById(R.id.emailTextView);
+
         FirebaseAuth.getInstance().addAuthStateListener(new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
                 if(user != null){
-                    if (user.getPhotoUrl() == null)
-                    {
-                        photo.setImageResource(R.drawable.user);
+                    if(user.getPhotoUrl() == null){
+                        photo.setImageResource(R.drawable.yohsr);
+                    } else {
+                        Glide.with(MainActivity.this)
+                                .load(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString())
+                                .circleCrop()
+                                .into(photo);
                     }
-                    else {
-                    Glide.with(MainActivity.this)
-                            .load(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString())
-                            .circleCrop()
-                            .into(photo);
-                    name.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-                    email.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                    }
-                    if(user.getDisplayName().isEmpty()){
+                    if(user.getDisplayName() == null){
                         name.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
                     }
                     else {
                         name.setText(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
                     }
+                    email.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
                 }
             }
         });
+
         FirebaseFirestore.getInstance().setFirestoreSettings(new FirebaseFirestoreSettings.Builder()
                 .setPersistenceEnabled(false)
                 .build());
+
     }
 
     @Override

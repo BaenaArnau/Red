@@ -35,12 +35,21 @@ import com.google.firebase.auth.GoogleAuthProvider;
 public class SignInFragment extends Fragment {
 
     NavController navController;
+
     private EditText emailEditText, passwordEditText;
     private Button emailSignInButton;
     private LinearLayout signInForm;
     private ProgressBar signInProgressBar;
-    private FirebaseAuth mAuth;
     private SignInButton googleSignInButton;
+
+    private FirebaseAuth mAuth;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_sign_in, container, false);
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -60,6 +69,7 @@ public class SignInFragment extends Fragment {
         emailSignInButton = view.findViewById(R.id.emailSignInButton);
         signInForm = view.findViewById(R.id.signInForm);
         signInProgressBar = view.findViewById(R.id.signInProgressBar);
+        mAuth = FirebaseAuth.getInstance();
 
         emailSignInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,7 +78,6 @@ public class SignInFragment extends Fragment {
             }
         });
 
-        mAuth = FirebaseAuth.getInstance();
         googleSignInButton = view.findViewById(R.id.googleSignInButton);
 
         googleSignInButton.setOnClickListener(new View.OnClickListener() {
@@ -79,49 +88,8 @@ public class SignInFragment extends Fragment {
         });
 
     }
-    private void accederConGoogle() {
-        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(requireActivity(), new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build());
 
-        startActivityForResult(googleSignInClient.getSignInIntent(), 12345);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == 12345) {
-            try {
-                firebaseAuthWithGoogle(GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException.class));
-            } catch (ApiException e) {
-                Log.e("ABCD", "signInResult:failed code=" + e.getStatusCode());
-            }
-        }
-    }
-
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        if(acct == null) return;
-
-        signInProgressBar.setVisibility(View.VISIBLE);
-        signInForm.setVisibility(View.GONE);
-
-        mAuth.signInWithCredential(GoogleAuthProvider.getCredential(acct.getIdToken(), null))
-                .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            Log.e("ABCD", "signInWithCredential:success");
-                            actualizarUI(mAuth.getCurrentUser());
-                        } else {
-                            Log.e("ABCD", "signInWithCredential:failure", task.getException());
-                            signInProgressBar.setVisibility(View.GONE);
-                            signInForm.setVisibility(View.VISIBLE);
-                        }
-                    }
-                });
-    }    private void accederConEmail() {
+    private void accederConEmail() {
         signInForm.setVisibility(View.GONE);
         signInProgressBar.setVisibility(View.VISIBLE);
 
@@ -146,10 +114,48 @@ public class SignInFragment extends Fragment {
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_sign_in, container, false);
+    private void accederConGoogle() {
+        GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(requireActivity(), new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build());
+
+        startActivityForResult(googleSignInClient.getSignInIntent(), 12345);
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 12345) {
+            try {
+                firebaseAuthWithGoogle(GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException.class));
+            } catch (ApiException e) {
+                Log.e("ABCD", "signInResult:failed code=" + e.getStatusCode());
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
+        if (acct == null) return;
+
+        signInProgressBar.setVisibility(View.VISIBLE);
+        signInForm.setVisibility(View.GONE);
+
+        mAuth.signInWithCredential(GoogleAuthProvider.getCredential(acct.getIdToken(), null))
+                .addOnCompleteListener(requireActivity(), new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.e("ABCD", "signInWithCredential:success");
+                            actualizarUI(mAuth.getCurrentUser());
+                        } else {
+                            Log.e("ABCD", "signInWithCredential:failure", task.getException());
+                            signInProgressBar.setVisibility(View.GONE);
+                            signInForm.setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+    }
+
 }

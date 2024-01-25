@@ -24,6 +24,11 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.chrono.ChronoLocalDate;
+import java.util.Calendar;
+
 public class HomeFragment extends Fragment {
 
     NavController navController;
@@ -52,7 +57,7 @@ public class HomeFragment extends Fragment {
 
         RecyclerView postsRecyclerView = view.findViewById(R.id.postsRecyclerView);
 
-        Query query = FirebaseFirestore.getInstance().collection("posts").limit(50);
+        Query query = FirebaseFirestore.getInstance().collection("posts").orderBy("timeStamp", Query.Direction.DESCENDING).limit(50);
 
         FirestoreRecyclerOptions<Post> options = new FirestoreRecyclerOptions.Builder<Post>()
                 .setQuery(query, Post.class)
@@ -114,11 +119,16 @@ public class HomeFragment extends Fragment {
             } else {
                 holder.mediaImageView.setVisibility(View.GONE);
             }
+            SimpleDateFormat formatter = new SimpleDateFormat("HH:mm dd/MM/yyyy");
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(post.timeStamp);
+
+            holder.timeTextView.setText(formatter.format(calendar.getTime()));
         }
 
         class PostViewHolder extends RecyclerView.ViewHolder {
             ImageView authorPhotoImageView, likeImageView, mediaImageView;
-            TextView authorTextView, contentTextView, numLikesTextView;
+            TextView authorTextView, contentTextView, numLikesTextView,  timeTextView;
             PostViewHolder(@NonNull View itemView) {
                 super(itemView);
                 authorPhotoImageView = itemView.findViewById(R.id.photoImageView);
@@ -127,8 +137,8 @@ public class HomeFragment extends Fragment {
                 authorTextView = itemView.findViewById(R.id.authorTextView);
                 contentTextView = itemView.findViewById(R.id.contentTextView);
                 numLikesTextView = itemView.findViewById(R.id.numLikesTextView);
+                timeTextView = itemView.findViewById(R.id.timeTextView);
             }
         }
     }
-
 }

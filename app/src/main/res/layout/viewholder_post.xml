@@ -63,5 +63,12 @@
                     android:text="200K"/>
             </LinearLayout>
         </LinearLayout>
+        <TextView
+            android:id="@+id/timeTextView"
+            android:textSize="10sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="HH:MM DD/MM/AAAA"/>
     </LinearLayout>
 </androidx.cardview.widget.CardView>
