@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(user != null){
                     if(user.getPhotoUrl() == null){
-                        photo.setImageResource(R.drawable.yohsr);
+                        Glide.with(MainActivity.this).load(R.drawable.yohsr).circleCrop().into(photo);
                     } else {
                         Glide.with(MainActivity.this)
                                 .load(FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString())

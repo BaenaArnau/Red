@@ -195,4 +195,5 @@ public class new_post extends Fragment {
     private void grabarAudio() {
         grabadoraAudio.launch(new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION));
     }
+
 }

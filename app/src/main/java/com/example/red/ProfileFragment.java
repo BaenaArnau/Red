@@ -1,5 +1,6 @@
 package com.example.red;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -29,6 +30,7 @@ public class ProfileFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
+    @SuppressLint("SuspiciousIndentation")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -40,10 +42,16 @@ public class ProfileFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if(user != null){
-            displayNameTextView.setText(user.getDisplayName());
-            emailTextView.setText(user.getEmail());
+            if (user.getDisplayName() != null) {
+                displayNameTextView.setText(user.getDisplayName());
+                emailTextView.setText(user.getEmail());
 
-            Glide.with(requireView()).load(user.getPhotoUrl()).into(photoImageView);
+                Glide.with(requireView()).load(user.getPhotoUrl()).into(photoImageView);
+            }
+            else
+                displayNameTextView.setText(user.getEmail().split("@")[0]);
+            emailTextView.setText(user.getEmail());
+            Glide.with(requireView()).load(R.drawable.yohsr).into(photoImageView);
         }
     }
 }

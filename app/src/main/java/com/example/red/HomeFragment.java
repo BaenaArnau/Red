@@ -1,5 +1,8 @@
 package com.example.red;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
@@ -81,7 +85,7 @@ public class HomeFragment extends Fragment {
         @Override
         protected void onBindViewHolder(@NonNull PostViewHolder holder, int position, @NonNull final Post post) {
             if (post.authorPhotoUrl == null){
-                holder.authorPhotoImageView.setImageResource(R.drawable.user);
+                Glide.with(getContext()).load(R.drawable.yohsr).circleCrop().into(holder.authorPhotoImageView);
             }
             else{
                 Glide.with(getContext()).load(post.authorPhotoUrl).circleCrop().into(holder.authorPhotoImageView);
@@ -103,6 +107,26 @@ public class HomeFragment extends Fragment {
                         .update("likes."+uid, post.likes.containsKey(uid) ?
                                 FieldValue.delete() : true);
             });
+
+            if(post.uid.equals(uid)) {
+                holder.deleteImageView.setVisibility(View.VISIBLE);
+                holder.deleteImageView.setOnClickListener(v -> {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setMessage("Confirmar borrado de post?")
+                            .setPositiveButton("Confirmar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    FirebaseFirestore.getInstance().collection("posts").document(postKey).delete();
+                                    Toast.makeText(getActivity(), "Post eliminado", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                }
+                            }).show();
+                });
+            }
+            else
+                holder.deleteImageView.setVisibility(View.GONE);
 
             // Miniatura de media
             if (post.mediaUrl != null) {
@@ -127,7 +151,7 @@ public class HomeFragment extends Fragment {
         }
 
         class PostViewHolder extends RecyclerView.ViewHolder {
-            ImageView authorPhotoImageView, likeImageView, mediaImageView;
+            ImageView authorPhotoImageView, likeImageView, mediaImageView, deleteImageView;
             TextView authorTextView, contentTextView, numLikesTextView,  timeTextView;
             PostViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -138,7 +162,9 @@ public class HomeFragment extends Fragment {
                 contentTextView = itemView.findViewById(R.id.contentTextView);
                 numLikesTextView = itemView.findViewById(R.id.numLikesTextView);
                 timeTextView = itemView.findViewById(R.id.timeTextView);
+                deleteImageView = itemView.findViewById(R.id.deleteImageView);
             }
         }
     }
+
 }

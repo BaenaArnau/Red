@@ -60,7 +60,17 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:layout_gravity="center_vertical"
-                    android:text="200K"/>
+                    android:text="200K"
+                    />
+                <ImageView
+                    android:id="@+id/deleteImageView"
+                    app:srcCompat="@drawable/delete"
+                    android:adjustViewBounds="true"
+                    android:layout_marginStart="110dp"
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:visibility="gone"/>
             </LinearLayout>
         </LinearLayout>
         <TextView
