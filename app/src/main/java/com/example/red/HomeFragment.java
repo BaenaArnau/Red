@@ -195,7 +195,9 @@ public class HomeFragment extends Fragment {
 
         class PostViewHolder extends RecyclerView.ViewHolder {
             ImageView authorPhotoImageView, likeImageView, mediaImageView, deleteImageView;
-            TextView authorTextView, contentTextView, numLikesTextView,  timeTextView;
+            TextView authorTextView, contentTextView, numLikesTextView, timeTextView;
+            String currentPhotoUrl; // Agregar esta variable
+
             PostViewHolder(@NonNull View itemView) {
                 super(itemView);
                 authorPhotoImageView = itemView.findViewById(R.id.photoImageView);
@@ -209,5 +211,4 @@ public class HomeFragment extends Fragment {
             }
         }
     }
-
 }

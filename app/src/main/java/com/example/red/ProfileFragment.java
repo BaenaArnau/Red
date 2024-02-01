@@ -48,36 +48,61 @@ public class ProfileFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user != null) {
-            String imageFileName = user.getEmail().replace("@", "_").replace(".", "_");
-            String photoUrl = "https://firebasestorage.googleapis.com/v0/b/sociallink-6ad1d.appspot.com/o/profiles%2F" + imageFileName + "?alt=media&token=83ed0ef5-db82-4d61-83f2-2b44b1d514f4";
+            // Verificar si el usuario tiene una foto de perfil de Google
+            if (user.getPhotoUrl() != null) {
+                // Si hay una URL de foto de perfil de Google, cargarla
+                Glide.with(requireView())
+                        .load(user.getPhotoUrl())
+                        .placeholder(R.drawable.yohsr)
+                        .error(R.drawable.yohsr)
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                Log.e("Glide", "Error loading image: " + e.getMessage());
+                                return false;
+                            }
 
-            if (user.getDisplayName() != null) {
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                Log.d("Glide", "Image loaded successfully");
+                                return false;
+                            }
+                        })
+                        .into(photoImageView);
+
                 displayNameTextView.setText(user.getDisplayName());
+                emailTextView.setText(user.getEmail());
             } else {
-                displayNameTextView.setText(user.getEmail().split("@")[0]);
+                String imageFileName = user.getEmail().replace("@", "_").replace(".", "_");
+                String photoUrl = "https://firebasestorage.googleapis.com/v0/b/sociallink-6ad1d.appspot.com/o/profiles%2F" + imageFileName + "?alt=media&token=83ed0ef5-db82-4d61-83f2-2b44b1d514f4";
+
+                if (user.getDisplayName() != null) {
+                    displayNameTextView.setText(user.getDisplayName());
+                } else {
+                    displayNameTextView.setText(user.getEmail().split("@")[0]);
+                }
+
+                emailTextView.setText(user.getEmail());
+
+                Glide.with(requireView())
+                        .load(photoUrl)
+                        .placeholder(R.drawable.yohsr)
+                        .error(R.drawable.yohsr)
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                Log.e("Glide", "Error loading image: " + e.getMessage());
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                Log.d("Glide", "Image loaded successfully");
+                                return false;
+                            }
+                        })
+                        .into(photoImageView);
             }
-
-            emailTextView.setText(user.getEmail());
-
-            Glide.with(requireView())
-                    .load(photoUrl)
-                    .placeholder(R.drawable.yohsr)
-                    .error(R.drawable.yohsr)
-                    .listener(new RequestListener<Drawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            Log.e("Glide", "Error loading image: " + e.getMessage());
-                            return false;
-                        }
-
-                        @Override
-                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            Log.d("Glide", "Image loaded successfully");
-                            return false;
-                        }
-                    })
-                    .into(photoImageView);
-
         }
     }
 }
