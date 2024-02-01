@@ -140,9 +140,6 @@ public class new_post extends Fragment {
                 .addOnSuccessListener(url -> guardarEnFirestore(postText, url.toString()));
     }
 
-
-
-
     private final ActivityResultLauncher<String> galeria =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 appViewModel.setMediaSeleccionado(uri, mediaTipo);
@@ -195,5 +192,4 @@ public class new_post extends Fragment {
     private void grabarAudio() {
         grabadoraAudio.launch(new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION));
     }
-
 }

@@ -27,7 +27,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.chrono.ChronoLocalDate;
@@ -84,12 +88,16 @@ public class HomeFragment extends Fragment {
 
         @Override
         protected void onBindViewHolder(@NonNull PostViewHolder holder, int position, @NonNull final Post post) {
-            if (post.authorPhotoUrl == null){
-                Glide.with(getContext()).load(R.drawable.yohsr).circleCrop().into(holder.authorPhotoImageView);
+            // Intentar cargar la imagen desde la URL de la foto de perfil de Google
+            if (post.authorPhotoUrl != null) {
+                cargarImagenDesdeGoogle(holder.authorPhotoImageView, post.authorPhotoUrl);
+            } else {
+                // Si no hay URL de la foto, cargar la imagen desde Firebase Storage
+                String imageFileName = post.author.replace("@", "_").replace(".", "_");
+                String photoUrl = "https://firebasestorage.googleapis.com/v0/b/sociallink-6ad1d.appspot.com/o/profiles%2F" + imageFileName + "?alt=media&token=83ed0ef5-db82-4d61-83f2-2b44b1d514f4";
+                cargarImagenDesdeFirebase(holder.authorPhotoImageView, imageFileName, photoUrl);
             }
-            else{
-                Glide.with(getContext()).load(post.authorPhotoUrl).circleCrop().into(holder.authorPhotoImageView);
-            }
+
             holder.authorTextView.setText(post.author);
             holder.contentTextView.setText(post.content);
 
@@ -148,6 +156,41 @@ public class HomeFragment extends Fragment {
             calendar.setTimeInMillis(post.timeStamp);
 
             holder.timeTextView.setText(formatter.format(calendar.getTime()));
+        }
+
+        private void cargarImagenDesdeGoogle(ImageView imageView, String photoUrl) {
+            Glide.with(getContext())
+                    .load(photoUrl)
+                    .placeholder(R.drawable.yohsr)
+                    .error(R.drawable.yohsr)
+                    .circleCrop()
+                    .into(imageView);
+        }
+
+        private void cargarImagenDesdeFirebase(ImageView imageView, String imageFileName, String photoUrl) {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference().child("profiles/" + imageFileName);
+
+            // Descargar la imagen como un File temporal
+            try {
+                final File localFile = File.createTempFile("images", "jpg");
+                storageRef.getFile(localFile).addOnSuccessListener(taskSnapshot -> {
+                    // Cuando la descarga es exitosa, carga la imagen en el ImageView
+                    Glide.with(getContext())
+                            .load(localFile)
+                            .placeholder(R.drawable.yohsr)
+                            .error(R.drawable.yohsr)
+                            .circleCrop()
+                            .into(imageView);
+                }).addOnFailureListener(e -> {
+                    // Manejar errores de descarga
+                    e.printStackTrace();
+                    // Si la descarga falla, cargar la imagen por defecto
+                    Glide.with(getContext()).load(R.drawable.yohsr).circleCrop().into(imageView);
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         class PostViewHolder extends RecyclerView.ViewHolder {

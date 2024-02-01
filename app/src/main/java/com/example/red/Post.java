@@ -25,7 +25,5 @@ public class Post {
         this.mediaUrl = mediaUrl;
         this.mediaType = mediaType;
         this.timeStamp = timeStamp;
-
     }
-
 }

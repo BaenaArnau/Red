@@ -6,6 +6,20 @@
     tools:context=".RegisterFragment"
     android:orientation="vertical">
 
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher_foreground"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="16dp"/>
+
+    <Button
+        android:id="@+id/choosePhotoButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Choose Photo"/>
+
     <EditText
         android:id="@+id/emailEditText"
         android:layout_width="match_parent"
