@@ -19,7 +19,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
@@ -76,8 +78,18 @@ public class RegisterFragment extends Fragment {
 
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
             selectedImageUri = data.getData();
-            ImageView profileImageView = requireView().findViewById(R.id.profileImageView);
-            profileImageView.setImageURI(selectedImageUri);
+            if (selectedImageUri != null) {
+                ImageView profileImageView = requireView().findViewById(R.id.profileImageView);
+
+                // Cargar la imagen con Glide y aplicar una transformación para reducir su tamaño
+                Glide.with(requireContext())
+                        .load(selectedImageUri)
+                        .override(500, 500)  // Establecer el tamaño máximo
+                        .into(profileImageView);
+            } else {
+                // No se seleccionó ninguna imagen, muestra un mensaje al usuario.
+                Toast.makeText(requireContext(), "No se ha seleccionado ninguna imagen", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -100,7 +112,10 @@ public class RegisterFragment extends Fragment {
                                 actualizarUI(uid);
                                 // Subir la foto solo si se seleccionó una
                                 if (selectedImageUri != null) {
-                                    subirFoto(selectedImageUri,emailEditText.getText().toString());
+                                    subirFoto(selectedImageUri, emailEditText.getText().toString());
+                                } else {
+                                    // No hay foto seleccionada, guardar URL como null
+                                    guardarUrlEnBaseDeDatos(null);
                                 }
                             }
                         } else {
