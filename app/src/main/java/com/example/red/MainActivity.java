@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                     .load(photoUrl)
                     .placeholder(R.drawable.yohsr)
                     .error(R.drawable.yohsr)
-                    .circleCrop()
+                    .centerCrop()
                     .into(imageView);
         }
     }
