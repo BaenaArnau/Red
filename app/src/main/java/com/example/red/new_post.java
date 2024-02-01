@@ -51,7 +51,6 @@ public class new_post extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_new_post, container, false);
     }
 
@@ -73,7 +72,6 @@ public class new_post extends Fragment {
             }
         });
 
-        // Cosas de multimedia
         view.findViewById(R.id.camara_fotos).setOnClickListener(v -> tomarFoto());
         view.findViewById(R.id.camara_video).setOnClickListener(v -> tomarVideo());
         view.findViewById(R.id.grabar_audio).setOnClickListener(v -> grabarAudio());

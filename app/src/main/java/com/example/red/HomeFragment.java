@@ -45,7 +45,6 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
@@ -88,11 +87,9 @@ public class HomeFragment extends Fragment {
 
         @Override
         protected void onBindViewHolder(@NonNull PostViewHolder holder, int position, @NonNull final Post post) {
-            // Intentar cargar la imagen desde la URL de la foto de perfil de Google
             if (post.authorPhotoUrl != null) {
                 cargarImagenDesdeGoogle(holder.authorPhotoImageView, post.authorPhotoUrl);
             } else {
-                // Si no hay URL de la foto, cargar la imagen desde Firebase Storage
                 String imageFileName = post.author.replace("@", "_").replace(".", "_");
                 String photoUrl = "https://firebasestorage.googleapis.com/v0/b/sociallink-6ad1d.appspot.com/o/profiles%2F" + imageFileName + "?alt=media&token=83ed0ef5-db82-4d61-83f2-2b44b1d514f4";
                 cargarImagenDesdeFirebase(holder.authorPhotoImageView, imageFileName, photoUrl);
@@ -136,7 +133,6 @@ public class HomeFragment extends Fragment {
             else
                 holder.deleteImageView.setVisibility(View.GONE);
 
-            // Miniatura de media
             if (post.mediaUrl != null) {
                 holder.mediaImageView.setVisibility(View.VISIBLE);
                 if ("audio".equals(post.mediaType)) {
@@ -171,11 +167,9 @@ public class HomeFragment extends Fragment {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference().child("profiles/" + imageFileName);
 
-            // Descargar la imagen como un File temporal
             try {
                 final File localFile = File.createTempFile("images", "jpg");
                 storageRef.getFile(localFile).addOnSuccessListener(taskSnapshot -> {
-                    // Cuando la descarga es exitosa, carga la imagen en el ImageView
                     Glide.with(getContext())
                             .load(localFile)
                             .placeholder(R.drawable.yohsr)
@@ -183,9 +177,7 @@ public class HomeFragment extends Fragment {
                             .circleCrop()
                             .into(imageView);
                 }).addOnFailureListener(e -> {
-                    // Manejar errores de descarga
                     e.printStackTrace();
-                    // Si la descarga falla, cargar la imagen por defecto
                     Glide.with(getContext()).load(R.drawable.yohsr).circleCrop().into(imageView);
                 });
             } catch (IOException e) {
@@ -196,7 +188,6 @@ public class HomeFragment extends Fragment {
         class PostViewHolder extends RecyclerView.ViewHolder {
             ImageView authorPhotoImageView, likeImageView, mediaImageView, deleteImageView;
             TextView authorTextView, contentTextView, numLikesTextView, timeTextView;
-            String currentPhotoUrl; // Agregar esta variable
 
             PostViewHolder(@NonNull View itemView) {
                 super(itemView);

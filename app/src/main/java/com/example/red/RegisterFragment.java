@@ -81,13 +81,11 @@ public class RegisterFragment extends Fragment {
             if (selectedImageUri != null) {
                 ImageView profileImageView = requireView().findViewById(R.id.profileImageView);
 
-                // Cargar la imagen con Glide y aplicar una transformación para reducir su tamaño
                 Glide.with(requireContext())
                         .load(selectedImageUri)
                         .override(500, 500)  // Establecer el tamaño máximo
                         .into(profileImageView);
             } else {
-                // No se seleccionó ninguna imagen, muestra un mensaje al usuario.
                 Toast.makeText(requireContext(), "No se ha seleccionado ninguna imagen", Toast.LENGTH_SHORT).show();
             }
         }
@@ -128,45 +126,32 @@ public class RegisterFragment extends Fragment {
     }
 
     private void subirFoto(Uri imageUri, String userEmail) {
-        // Utilizar el correo del usuario como nombre de la imagen
         String imageFileName = userEmail.replace("@", "_").replace(".", "_");
 
-        // Obtén la referencia al archivo en Firebase Storage
         StorageReference imageRef = FirebaseStorage.getInstance().getReference().child("profiles/" + imageFileName);
 
-        // Sube la imagen al almacenamiento
         imageRef.putFile(imageUri)
                 .addOnSuccessListener(taskSnapshot -> {
-                    // Imagen cargada exitosamente, ahora obtén la URL
                     imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                         String photoUrl = uri.toString();
-                        // Guardar la URL en tu base de datos o donde sea necesario.
                         guardarUrlEnBaseDeDatos(photoUrl);
                     });
                 })
                 .addOnFailureListener(e -> {
-                    // Manejar errores
                     Snackbar.make(requireView(), "Error al cargar la foto: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
                 });
     }
 
     private void guardarUrlEnBaseDeDatos(String photoUrl) {
-        // Obtener el UID del usuario actual
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Guardar la URL de la foto en la base de datos (por ejemplo, Firebase Realtime Database o Firestore)
-
-        // Ejemplo con Firebase Realtime Database
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference().child("users").child(uid);
         databaseRef.child("photoUrl").setValue(photoUrl)
                 .addOnSuccessListener(aVoid -> {
-                    // La URL de la foto se ha guardado correctamente en la base de datos.
                     registerButton.setEnabled(true);
-                    // Redirigir a la pantalla principal
                     navController.navigate(R.id.homeFragment);
                 })
                 .addOnFailureListener(e -> {
-                    // Manejar errores al guardar la URL en la base de datos.
                     Snackbar.make(requireView(), "Error al guardar la URL de la foto en la base de datos: " + e.getMessage(), Snackbar.LENGTH_LONG).show();
                     registerButton.setEnabled(true);
                 });

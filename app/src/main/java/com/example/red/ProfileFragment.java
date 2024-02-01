@@ -48,9 +48,7 @@ public class ProfileFragment extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user != null) {
-            // Verificar si el usuario tiene una foto de perfil de Google
             if (user.getPhotoUrl() != null) {
-                // Si hay una URL de foto de perfil de Google, cargarla
                 Glide.with(requireView())
                         .load(user.getPhotoUrl())
                         .placeholder(R.drawable.yohsr)
